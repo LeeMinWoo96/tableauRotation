@@ -34,11 +34,12 @@
                     frame.src = data.url;
                 })
                 .catch(error => {
+                    // console.error('error')
                     console.error('Error fetching the URL:', error);
                 });
         };
 
-        setInterval(rotateUrl, 5000); // Change URL every 5 seconds
+        setInterval(rotateUrl, 50000); // Change URL every 5 seconds
         rotateUrl(); // Initial load
     </script>
 </body>

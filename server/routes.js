@@ -1,4 +1,6 @@
 import express from 'express';
+import getTableauToken from '../scripts/getToken.js';
+// const getTableauToken = require('../scripts/getToken');
 
 const router = express.Router();
 
@@ -11,9 +13,16 @@ const urls = [
 
 let currentIndex = 0;
 
-router.get('/rotate', (req, res) => {
+router.get('/rotate', async (req, res) => {
     currentIndex = (currentIndex + 1) % urls.length;
-    res.json({ url: urls[currentIndex] });
+    const token = await getTableauToken();
+
+    if (token) {
+        const urlWithToken = `${urls[currentIndex]}&:tabs=n&:toolbar=n&:token=${token}`;
+        res.json({ url: urlWithToken });
+    } else {
+        res.status(500).json({ error: 'Failed to get Tableau token' });
+    }
 });
 
 export default router;

@@ -16,7 +16,7 @@ const getTableauToken = async () => {
 
         if (token == '-1') {
             console.error('Failed to get Tableau token');
-            console.error(response)
+            // console.error(response)
         } else {
             console.log('Tableau token:', token);
         }
@@ -25,4 +25,4 @@ const getTableauToken = async () => {
     }
 };
 
-getTableauToken();
+export default getTableauToken;
