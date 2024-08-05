@@ -19,7 +19,7 @@ const getTableauToken = async () => {
             
             // console.error(response)
         } else {
-            console.log('Tableau token:', token);
+            console.debug('Tableau token:', token);
             return token
         }
     } catch (error) {
