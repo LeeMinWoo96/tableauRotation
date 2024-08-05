@@ -8,4 +8,6 @@ Tableau Ticket을 사용하여 구현되어 SameSite 이슈 떄문에 FireFox �
 
 
 
-
+* 토큰 발급 요청 (태블로 서버 URL) 과 Node 서버의 URL 이 일치하면 SameSite 무관   
+* 즉  태블로 서버가 공인망이면, Node 서버도 동일한 서버의 공인망이여야함, 만약 노트북 개발환경애서 해야한다면, https 설정과 SameSite=None 가 필수   
+* 태블로에서 SameSite=None 설정 가능 유무는 확인 필요
