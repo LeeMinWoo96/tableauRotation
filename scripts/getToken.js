@@ -8,7 +8,7 @@ const getTableauToken = async () => {
     try {
         const response = await axios.post(trustedAuthUrl, null, {
             params: {
-                username: "insang.cho@spc.co.kr",
+                username: username,
             },
         });
 
@@ -16,13 +16,16 @@ const getTableauToken = async () => {
 
         if (token == '-1') {
             console.error('Failed to get Tableau token');
+            
             // console.error(response)
         } else {
             console.log('Tableau token:', token);
+            return token
         }
     } catch (error) {
         console.error('Error getting Tableau token:', error);
     }
+    
 };
 
 export default getTableauToken;
