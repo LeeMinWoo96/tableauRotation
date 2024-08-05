@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Rotator</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8f4f4;
+        }
+        #iframe-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 1600px;
+            max-height: 1000px;
+        }
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        #fullscreen-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1000;
+            font-size: 16px;
+        }
+        :fullscreen::backdrop {
+            background-color: #f8f4f4; /* Change this to your desired color */
+        }
+    </style>
+</head>
+<body>
+    <!-- <button id="fullscreen-btn">Go Fullscreen</button> -->
+    <div id="iframe-container"></div>
+    <script>
+        const iframeContainer = document.getElementById('iframe-container');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        let iframes = [];
+        let currentIndex = 0;
+
+        const preloadUrls = () => {
+            iframes = [];
+            fetch('/api/urls')
+                .then(response => response.json())
+                .then(data => {
+                    iframeContainer.innerHTML = ''; // Clear existing iframes
+
+                    const iframePromises = data.urls.map((url, index) => {
+                        return new Promise((resolve, reject) => {
+                            const iframe = document.createElement('iframe');
+                            iframe.src = url;
+                            iframe.allowFullscreen = true;
+                            iframe.style.top = '9999px';
+                            iframe.style.left = '-9999px';
+
+                            iframe.onload = () => resolve(iframe);
+                            iframe.onerror = () => reject(new Error(`Failed to load iframe with src: ${url}`));
+                            iframeContainer.appendChild(iframe);
+                        });
+                    });
+
+                    Promise.all(iframePromises)
+                        .then(loadedIframes => {
+                            iframes = loadedIframes;
+                            if (iframes.length > 0) {
+                                iframes[0].style.top = 0;
+                                iframes[0].style.left = 0;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error loading iframes:', error);
+                        });
+                })
+                .catch(error => {
+                    console.error('Error preloading the URLs:', error);
+                });
+        };
+
+        const rotateUrl = () => {
+            if (iframes.length > 0) {
+                const previousIndex = currentIndex;
+                currentIndex = (currentIndex + 1) % iframes.length;
+
+                // Check if the document is in fullscreen mode
+                const isFullscreen = !!document.fullscreenElement;
+
+                if (isFullscreen) {
+                    // Exit fullscreen mode
+                    // document.exitFullscreen().then(() => {
+                        changeIframe(previousIndex, currentIndex);
+                        // Re-enter fullscreen mode after iframe change
+                        // goFullscreen();
+                    // });
+                } else {
+                    changeIframe(previousIndex, currentIndex);
+                }
+            }
+        };
+
+        const changeIframe = (previousIndex, currentIndex) => {
+            iframes[previousIndex].style.top = '9999px';
+            iframes[previousIndex].style.left = '-9999px';
+            iframes[currentIndex].style.top = 0;
+            iframes[currentIndex].style.left = 0;
+        };
+
+        // const goFullscreen = () => {
+        //     const frame = iframes[currentIndex];
+        //     if (frame.requestFullscreen) {
+        //         frame.requestFullscreen();
+        //     } else if (frame.mozRequestFullScreen) {
+        //         frame.mozRequestFullScreen();
+        //     } else if (frame.webkitRequestFullscreen) {
+        //         frame.webkitRequestFullscreen();
+        //     } else if (frame.msRequestFullscreen) {
+        //         frame.msRequestFullscreen();
+        //     }
+        // };
+
+        // fullscreenBtn.addEventListener('click', goFullscreen);
+
+        preloadUrls();
+
+        setInterval(rotateUrl, 10000);
+
+        setInterval(preloadUrls, 3600000);
+
+        const resizeIframes = () => {
+            iframes.forEach(iframe => {
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+            });
+        };
+
+        window.addEventListener('resize', resizeIframes);
+        window.addEventListener('load', resizeIframes);
+    </script>
+</body>
+</html>
