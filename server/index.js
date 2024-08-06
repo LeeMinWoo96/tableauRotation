@@ -20,7 +20,13 @@ app.get('/cache', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'cacheIndex.html'));
 });
 
+app.get('/testDirection', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'test.html'));
+});
+
 app.use('/api', routes);
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);

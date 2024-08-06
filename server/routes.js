@@ -5,6 +5,8 @@ import getTableauToken from '../scripts/getToken.js';
 const router = express.Router();
 
 const urls = [
+    'https://jaydata.tistory.com/95',
+    'https://github.com/LeeMinWoo96',
     'http://10.0.50.185/trusted/:token/views/POS_NEW_2_17158490567760/POS?:embed=yes&:showVizHome=no&:toolbar=no',
     'http://10.0.50.185/trusted/:token/views/_BR_/BR?:embed=yes&:showVizHome=no&:toolbar=no',
     'http://10.0.50.185/trusted/:token/views/_DD_/DD?:embed=yes&:showVizHome=no&:toolbar=no',

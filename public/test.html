@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="X-UA-Compatible" IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>URL Rotator</title>
     <style>
@@ -37,32 +37,73 @@
             position: absolute;
             top: 10px;
             padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
+            /* background-color: #007bff; */
+            /* color: white; */
             border: none;
             border-radius: 5px;
             cursor: pointer;
             z-index: 1000;
             font-size: 16px;
+            display: flex;
+            align-items: center;
         }
-        #stop-btn { left: 10px; }
-        #left-btn { left: 120px; }
-        #right-btn { left: 230px; }
+        .control-btn img {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+        #stop-btn { left: 70px; }
+        #left-btn { left: 10px; }
+        #right-btn { left: 130px; }
+        #interval-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+        }
+        #interval-container label {
+            margin-right: 10px;
+        }
+        #interval-slider {
+            width: 150px;
+        }
     </style>
 </head>
 <body>
-    <button id="stop-btn" class="control-btn">Stop</button>
-    <button id="left-btn" class="control-btn">Left</button>
-    <button id="right-btn" class="control-btn">Right</button>
+    
+    <button id="left-btn" class="control-btn">
+        <img src="icons/arrow-left.svg" alt="Left Arrow Icon">
+        <!-- Left -->
+    </button>
+
+    <button id="stop-btn" class="control-btn">
+        <img src="icons/play.svg" alt="Play Icon">
+        <!-- Start -->
+    </button>
+
+    <button id="right-btn" class="control-btn">
+        <img src="icons/arrow-right.svg" alt="Right Arrow Icon">
+        <!-- Right -->
+    </button>
+    <div id="interval-container">
+        <label for="interval-slider">Interval (sec):</label>
+        <input type="range" id="interval-slider" min="5" max="60" step="5" value="20">
+        <span id="interval-value">20</span>
+    </div>
     <div id="iframe-container"></div>
     <script>
         const iframeContainer = document.getElementById('iframe-container');
         const stopBtn = document.getElementById('stop-btn');
         const leftBtn = document.getElementById('left-btn');
         const rightBtn = document.getElementById('right-btn');
+        const intervalSlider = document.getElementById('interval-slider');
+        const intervalValue = document.getElementById('interval-value');
         let iframes = [];
         let currentIndex = 0;
         let rotateInterval = null;
+        let intervalTime = 20000;
 
         const preloadUrls = () => {
             iframes = [];
@@ -106,7 +147,6 @@
             if (iframes.length > 0) {
                 const previousIndex = currentIndex;
                 currentIndex = (currentIndex + direction + iframes.length) % iframes.length;
-
                 changeIframe(previousIndex, currentIndex);
             }
         };
@@ -120,7 +160,7 @@
 
         const startRotation = () => {
             stopRotation();
-            rotateInterval = setInterval(() => rotateUrl(1), 20000);
+            rotateInterval = setInterval(() => rotateUrl(1), intervalTime);
         };
 
         const stopRotation = () => {
@@ -132,16 +172,24 @@
 
         stopBtn.addEventListener('click', () => {
             if (rotateInterval) {
-                stopBtn.textContent = "Start";
+                stopBtn.innerHTML = '<img src="icons/play.svg" alt="Play Icon">';
                 stopRotation();
             } else {
-                stopBtn.textContent = "Stop";
+                stopBtn.innerHTML = '<img src="icons/pause.svg" alt="pause Icon">';
                 startRotation();
             }
         });
 
         leftBtn.addEventListener('click', () => rotateUrl(-1));
         rightBtn.addEventListener('click', () => rotateUrl(1));
+
+        intervalSlider.addEventListener('input', (event) => {
+            intervalTime = event.target.value * 1000;
+            intervalValue.textContent = event.target.value;
+            if (rotateInterval) {
+                startRotation(); // Restart rotation with new interval
+            }
+        });
 
         preloadUrls();
         startRotation();
