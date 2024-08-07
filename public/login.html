@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Tableau Dashboard System</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 300px;
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input[type="email"], button {
+            height: 40px;
+            padding: 8px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #0056b3;
+            color: white;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #004494;
+        }
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            visibility: hidden; /* Hidden by default */
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+        }
+        .close-btn {
+            float: right;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Tableau Dashboard System</h2>
+        <form action="/auth/login" method="post">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+    <!-- Modal -->
+    <div id="loginFailedModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <p>등록된 테블로 사용자가 아닙니다.</p>
+        </div>
+    </div>
+    <script>
+
+        document.querySelector('form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const email = document.getElementById('email').value;
+        fetch('/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `email=${encodeURIComponent(email)}`
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.href = '/dashboard';
+            } else {
+                return response.json();  // 로그인 실패 메시지 받기
+            }
+        })
+        .then(data => {
+            if (data && data.error) {
+                document.querySelector('.modal-content p').textContent = data.error;
+                showModal();  // 모달 표시 함수 호출
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+        // Handling the modal
+        const loginFailedModal = document.getElementById('loginFailedModal');
+        const closeBtn = document.querySelector('.close-btn');
+
+        closeBtn.onclick = function() {
+            loginFailedModal.style.visibility = 'hidden';
+            loginFailedModal.style.opacity = 0;
+        }
+
+        // Function to show modal
+        function showModal() {
+            loginFailedModal.style.visibility = 'visible';
+            loginFailedModal.style.opacity = 1;
+        }
+
+        // Example of triggering the modal on a failed login
+        // This part should be tied with actual login failure logic
+        // showModal(); // Uncomment to test or integrate as needed
+    </script>
+</body>
+</html>

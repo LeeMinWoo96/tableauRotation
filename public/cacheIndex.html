@@ -33,9 +33,10 @@
             height: 100%;
             border: none;
         }
-        .control-btn {
+        #fullscreen-btn {
             position: absolute;
             top: 10px;
+            left: 10px;
             padding: 10px 20px;
             background-color: #007bff;
             color: white;
@@ -45,24 +46,19 @@
             z-index: 1000;
             font-size: 16px;
         }
-        #stop-btn { left: 10px; }
-        #left-btn { left: 120px; }
-        #right-btn { left: 230px; }
+        :fullscreen::backdrop {
+            background-color: #f8f4f4; /* Change this to your desired color */
+        }
     </style>
 </head>
 <body>
-    <button id="stop-btn" class="control-btn">Stop</button>
-    <button id="left-btn" class="control-btn">Left</button>
-    <button id="right-btn" class="control-btn">Right</button>
+    <!-- <button id="fullscreen-btn">Go Fullscreen</button> -->
     <div id="iframe-container"></div>
     <script>
         const iframeContainer = document.getElementById('iframe-container');
-        const stopBtn = document.getElementById('stop-btn');
-        const leftBtn = document.getElementById('left-btn');
-        const rightBtn = document.getElementById('right-btn');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
         let iframes = [];
         let currentIndex = 0;
-        let rotateInterval = null;
 
         const preloadUrls = () => {
             iframes = [];
@@ -102,12 +98,24 @@
                 });
         };
 
-        const rotateUrl = (direction) => {
+        const rotateUrl = () => {
             if (iframes.length > 0) {
                 const previousIndex = currentIndex;
-                currentIndex = (currentIndex + direction + iframes.length) % iframes.length;
+                currentIndex = (currentIndex + 1) % iframes.length;
 
-                changeIframe(previousIndex, currentIndex);
+                // Check if the document is in fullscreen mode
+                const isFullscreen = !!document.fullscreenElement;
+
+                if (isFullscreen) {
+                    // Exit fullscreen mode
+                    // document.exitFullscreen().then(() => {
+                        changeIframe(previousIndex, currentIndex);
+                        // Re-enter fullscreen mode after iframe change
+                        // goFullscreen();
+                    // });
+                } else {
+                    changeIframe(previousIndex, currentIndex);
+                }
             }
         };
 
@@ -118,33 +126,24 @@
             iframes[currentIndex].style.left = 0;
         };
 
-        const startRotation = () => {
-            stopRotation();
-            rotateInterval = setInterval(() => rotateUrl(1), 20000);
-        };
+        // const goFullscreen = () => {
+        //     const frame = iframes[currentIndex];
+        //     if (frame.requestFullscreen) {
+        //         frame.requestFullscreen();
+        //     } else if (frame.mozRequestFullScreen) {
+        //         frame.mozRequestFullScreen();
+        //     } else if (frame.webkitRequestFullscreen) {
+        //         frame.webkitRequestFullscreen();
+        //     } else if (frame.msRequestFullscreen) {
+        //         frame.msRequestFullscreen();
+        //     }
+        // };
 
-        const stopRotation = () => {
-            if (rotateInterval) {
-                clearInterval(rotateInterval);
-                rotateInterval = null;
-            }
-        };
-
-        stopBtn.addEventListener('click', () => {
-            if (rotateInterval) {
-                stopBtn.textContent = "Start";
-                stopRotation();
-            } else {
-                stopBtn.textContent = "Stop";
-                startRotation();
-            }
-        });
-
-        leftBtn.addEventListener('click', () => rotateUrl(-1));
-        rightBtn.addEventListener('click', () => rotateUrl(1));
+        // fullscreenBtn.addEventListener('click', goFullscreen);
 
         preloadUrls();
-        startRotation();
+
+        setInterval(rotateUrl, 20000);
 
         setInterval(preloadUrls, 3600000);
 
