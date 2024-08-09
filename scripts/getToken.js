@@ -2,9 +2,9 @@
 import axios from 'axios';
 import config from '../config/config.js';
 
-const { tableauServerUrl } = config;
+// const { tableauServerUrl } = config;
 
-const getTableauToken = async (username) => {
+const getTableauToken = async (username, tableauServerUrl) => {
     const trustedAuthUrl = `${tableauServerUrl}/trusted`;
     try {
         const response = await axios.post(trustedAuthUrl, null, {
@@ -15,7 +15,7 @@ const getTableauToken = async (username) => {
             console.error('Failed to get Tableau token');
             return null;
         } else {
-            console.debug('Tableau token:', token);
+            console.debug(`Tableau username: ${username} token: ${token}`);
             return token;
         }
     } catch (error) {
