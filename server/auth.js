@@ -1,7 +1,7 @@
 // auth.js
 import express from 'express';
 import getTableauToken from '../scripts/getToken.js';
-
+import logger from '../config/logger.js';
 
 const authRouter = express.Router();
 

@@ -6,8 +6,9 @@ import bodyParser from 'body-parser';
 import routes from './routes.js';
 import authRouter from './auth.js';
 import config from '../config/config.js';
+import logger from '../config/logger.js';
 
-const { tableauServerUrl } = config;
+const { tableauServerUrl,tableauInternelServerUrl } = config;
 
 dotenv.config();
 
@@ -47,7 +48,7 @@ function ipCheckMiddleware(req, res, next) {
 
     if (checkIfPrivateIP(ip)) {
         // console.debug("Access from Private IP:", ip);
-        req.session.tableauServerUrl = ip  // 하드코딩할까나
+        req.session.tableauServerUrl = tableauInternelServerUrl  // 하드코딩할까나
         // 사설 IP에서 접근한 경우의 설정
     } else {
         // console.debug("Access from Public IP:", ip);
@@ -94,5 +95,6 @@ app.use((req, res) => {
 
 // Start server
 app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+    logger.info(`Server is running on http://localhost:${port}`);
+    // console.log(`Server is running on http://localhost:${port}`);
 });

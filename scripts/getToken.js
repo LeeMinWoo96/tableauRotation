@@ -1,6 +1,7 @@
 // getToken.js
 import axios from 'axios';
 import config from '../config/config.js';
+import logger from '../config/logger.js';
 
 // const { tableauServerUrl } = config;
 
@@ -12,14 +13,14 @@ const getTableauToken = async (username, tableauServerUrl) => {
         });
         const token = response.data;
         if (token == '-1') {
-            console.error('Failed to get Tableau token');
+            logger.error('Failed to get Tableau token');
             return null;
         } else {
-            console.debug(`Tableau username: ${username} token: ${token}`);
+            logger.info(`Tableau username: ${username} token: ${token}`);
             return token;
         }
     } catch (error) {
-        console.error('Error getting Tableau token:', error);
+        logger.error('Error getting Tableau token:', error);
         return null;
     }
 };

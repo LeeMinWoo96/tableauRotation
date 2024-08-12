@@ -74,7 +74,7 @@ router.get('/urls', async (req, res) => {
 
 
 router.get('/url-sizes', async (req, res) => {
-    console.debug("size ",urls.length)
+    logger.debug("size ",urls.length)
     res.json({ size : urls.length });
 });
     
@@ -83,13 +83,13 @@ router.get('/url-sizes', async (req, res) => {
 router.get('/urls/:path', async (req, res) => {
     const { path } = req.params;
     const token = req.session.tableauToken;
-    
+    const tableauServerUrl = req.session.tableauServerUrl;
     if (!token) {
       return res.status(401).json({ error: 'AUTHENTICATION REQUIRED' });
     }
   
     try {
-      const urls = await getUrlsForPath(path);
+      const urls = await getUrlsForPath(path,tableauServerUrl);
       const resolvedUrls = await Promise.all(urls.map(
         async url => {
           const token = await getTableauToken(req.session.username, req.session.tableauServerUrl);
@@ -107,8 +107,9 @@ router.get('/urls/:path', async (req, res) => {
   
   router.get('/url-sizes/:path', async (req, res) => {
     const { path } = req.params;
+    const tableauServerUrl = req.session.tableauServerUrl;
     try {
-      const urls = await getUrlsForPath(path);
+      const urls = await getUrlsForPath(path,tableauServerUrl);
       res.json({ size: urls.length });
     } catch (error) {
       res.status(500).json({ error: 'FAILED TO GET URL SIZES' });

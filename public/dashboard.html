@@ -36,9 +36,7 @@
         .control-btn {
             position: absolute;
             top: 10px;
-            padding: 10px 20px;
-            /* background-color: #007bff; */
-            /* color: white; */
+            padding: 10px 10px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -46,65 +44,96 @@
             font-size: 16px;
             display: flex;
             align-items: center;
+            background-color: rgba(0, 123, 255, 0.1);
+            color: #007bff;
+            transition: background-color 0.3s;
         }
         .control-btn img {
             width: 20px;
             height: 20px;
             margin-right: 5px;
         }
-        #stop-btn { left: 70px; }
-        #left-btn { left: 10px; }
-        #right-btn { left: 130px; }
+        .control-btn:hover {
+            background-color: rgba(0, 123, 255, 0.3);
+        }
+        #stop-btn { left: 180px;}
+        #left-btn { left: 135px; }
+        #right-btn { left: 225px;}
         #interval-container {
             position: absolute;
             top: 10px;
-            right: 10px;
+            left: 10px;
             z-index: 1000;
             display: flex;
             align-items: center;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
         }
-        #interval-container label {
+        #interval-container img {
+            width: 20px;
+            height: 20px;
             margin-right: 10px;
+            opacity: 0.8;
         }
-        #interval-slider {
-            width: 150px;
+        #interval-container select {
+            padding: 7px;
+            border-radius: 5px;
+            border: 1px solid #007bff;
+            font-size: 14px;
+            cursor: pointer;
+            background-color: white;
+            color: #007bff;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('icons/arrow-down.svg');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+        #interval-container select:focus {
+            outline: none;
+            border-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    
+    <div id="interval-container">
+        <img src="icons/refresh.svg" alt="Refresh Icon">
+        <select id="interval-select">
+            <option value="10000">10 sec</option>
+            <option value="20000" selected>20 sec</option>
+            <option value="30000">30 sec</option>
+            <option value="60000">1 min</option>
+        </select>
+    </div>
+
     <button id="left-btn" class="control-btn">
-        <img src="icons/arrow-left.svg" alt="Left Arrow Icon">
-        <!-- Left -->
+        <img src="icons/arrow-left-2.svg" alt="Left Arrow Icon">
     </button>
 
     <button id="stop-btn" class="control-btn">
         <img src="icons/pause.svg" alt="Play Icon">
-        <!-- Start -->
     </button>
 
     <button id="right-btn" class="control-btn">
-        <img src="icons/arrow-right.svg" alt="Right Arrow Icon">
-        <!-- Right -->
+        <img src="icons/arrow-right-2.svg" alt="Right Arrow Icon">
     </button>
-    <div id="interval-container">
-        <label for="interval-slider">Interval (sec):</label>
-        <input type="range" id="interval-slider" min="5" max="60" step="5" value="20">
-        <span id="interval-value">20</span>
-    </div>
+
     <div id="iframe-container"></div>
+
     <script>
         const iframeContainer = document.getElementById('iframe-container');
         const stopBtn = document.getElementById('stop-btn');
         const leftBtn = document.getElementById('left-btn');
         const rightBtn = document.getElementById('right-btn');
-        const intervalSlider = document.getElementById('interval-slider');
-        const intervalValue = document.getElementById('interval-value');
+        const intervalSelect = document.getElementById('interval-select');
         let iframes = [];
         let currentIndex = 0;
         let rotateInterval = null;
-        let intervalTime = 20000;
-        let path = ''; // 기본값
+        let intervalTime = parseInt(intervalSelect.value);
+        let path = '';
 
         const getPath = () => {
             return fetch('/auth/selectPath')
@@ -124,7 +153,7 @@
             fetch(`/api/urls/${path}`)
                 .then(response => response.json())
                 .then(data => {
-                    iframeContainer.innerHTML = ''; // Clear existing iframes
+                    iframeContainer.innerHTML = '';
 
                     const iframePromises = data.urls.map((url, index) => {
                         return new Promise((resolve, reject) => {
@@ -189,7 +218,7 @@
                 stopBtn.innerHTML = '<img src="icons/play.svg" alt="Play Icon">';
                 stopRotation();
             } else {
-                stopBtn.innerHTML = '<img src="icons/pause.svg" alt="pause Icon">';
+                stopBtn.innerHTML = '<img src="icons/pause.svg" alt="Pause Icon">';
                 startRotation();
             }
         });
@@ -197,18 +226,14 @@
         leftBtn.addEventListener('click', () => rotateUrl(-1));
         rightBtn.addEventListener('click', () => rotateUrl(1));
 
-        intervalSlider.addEventListener('input', (event) => {
-            intervalTime = event.target.value * 1000;
-            intervalValue.textContent = event.target.value;
+        intervalSelect.addEventListener('change', (event) => {
+            intervalTime = parseInt(event.target.value);
             if (rotateInterval) {
                 startRotation(); // Restart rotation with new interval
             }
         });
 
         getPath().then(() => {
-            console.log("getapth");
-            console.log(path);
-            
             preloadUrls();
             startRotation();
         });

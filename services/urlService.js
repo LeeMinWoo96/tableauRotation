@@ -27,7 +27,21 @@ async function getPaths() {
   }
 }
 
-async function getUrlsForPath(path) {
+function transformUrl(url, tableauServerUrl) {
+  const urlParts = url.split('/#/views/');  // '/#/views/'을 기준으로 분리
+  if (urlParts.length > 1) {
+    const viewPath = urlParts[1];  // '#/views/' 이후의 경로를 가져옴
+    return `${tableauServerUrl}/trusted/:token/views/${viewPath}?:embed=yes&:showVizHome=no&:toolbar=no`;
+  } else {
+    // 변환 실패시 원본 URL 반환
+    return url;
+  }
+}
+
+export { transformUrl };
+
+
+async function getUrlsForPath(path,tableauServerUrl) {
   let connection;
   try {
     connection = await oracledb.getConnection(dbConfig);
@@ -35,8 +49,9 @@ async function getUrlsForPath(path) {
       `SELECT URL FROM MST_DASHBOARD_URLS WHERE DASHBOARD_ID = (SELECT DASHBOARD_ID FROM MST_DASHBOARDS WHERE DASHBOARD_NAME = :path and USE_YN ='Y') and USE_YN ='Y' ORDER BY ORDER_NUM`,
       [path]
     );
+    const transformedUrls = result.rows.map(row => transformUrl(row[0], tableauServerUrl));
+    return transformedUrls;
     
-    return result.rows.map(row => row[0]); // 데이터베이스 열 이름에 따라 조정 필요
   } catch (err) {
     console.error(err);
     return [];
