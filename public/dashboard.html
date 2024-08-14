@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" IE=edge">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URL Rotator</title>
+    <title>Rotation Dashboard</title>
     <style>
         body, html {
             margin: 0;
@@ -76,6 +76,7 @@
             height: 20px;
             margin-right: 10px;
             opacity: 0.8;
+            cursor: pointer; /* Add cursor to indicate it's clickable */
         }
         #interval-container select {
             padding: 7px;
@@ -100,7 +101,7 @@
 </head>
 <body>
     <div id="interval-container">
-        <img src="icons/refresh.svg" alt="Refresh Icon">
+        <img id="refresh-icon" src="icons/refresh.svg" alt="Refresh Icon"> <!-- ID added for refresh icon -->
         <select id="interval-select">
             <option value="10000">10 sec</option>
             <option value="20000" selected>20 sec</option>
@@ -129,6 +130,8 @@
         const leftBtn = document.getElementById('left-btn');
         const rightBtn = document.getElementById('right-btn');
         const intervalSelect = document.getElementById('interval-select');
+        const refreshIcon = document.getElementById('refresh-icon'); // Refresh icon element
+
         let iframes = [];
         let currentIndex = 0;
         let rotateInterval = null;
@@ -149,6 +152,10 @@
         };
 
         const preloadUrls = () => {
+            while (iframeContainer.firstChild) {
+                iframeContainer.removeChild(iframeContainer.firstChild);
+            }
+
             iframes = [];
             fetch(`/api/urls/${path}`)
                 .then(response => response.json())
@@ -233,12 +240,32 @@
             }
         });
 
+        // 키보드 이벤트 처리
+        document.addEventListener('keydown', (event) => {
+            switch (event.code) {
+                case 'Space':
+                    stopBtn.click(); // 스페이스바로 Stop/Play
+                    break;
+                case 'ArrowLeft':
+                    leftBtn.click(); // 왼쪽 화살표로 이전 URL
+                    break;
+                case 'ArrowRight':
+                    rightBtn.click(); // 오른쪽 화살표로 다음 URL
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        // Refresh icon 클릭 시 preloadUrls 호출
+        refreshIcon.addEventListener('click', preloadUrls);
+
         getPath().then(() => {
             preloadUrls();
             startRotation();
         });
 
-        setInterval(preloadUrls, 3600000);
+        setInterval(preloadUrls, 1200000);
 
         const resizeIframes = () => {
             iframes.forEach(iframe => {
