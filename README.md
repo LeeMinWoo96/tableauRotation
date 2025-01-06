@@ -1,41 +1,54 @@
-# tableauRotation
-태블로 Embedded Views Auto Rotation
+# Tableau Rotation Service 📊
 
-V. 24.08.05  
-* Tableau Ticket을 사용하여 구현되어 SameSite 이슈 떄문에 FireFox 기반 브라우저에만 작동   
-[1. SameSite Issue 란?](https://www.codeit.kr/tutorials/94/%EC%BF%A0%ED%82%A4%EC%9D%98%20SameSite%20%EC%98%B5%EC%85%98%EC%9D%B4%EB%9E%80%3F)   
-[2. Tableau SameSite Issue](https://help.salesforce.com/s/articleView?id=001472205&type=1)
+태블로 대시보드 자동 로테이션
 
-* 토큰 발급 요청 (태블로 서버 URL) 과 Node 서버의 URL 이 일치하면 SameSite 무관   
-* 즉  태블로 서버가 공인망이면, Node 서버도 동일한 서버의 공인망이여야함, 만약 노트북 개발환경애서 해야한다면, https 설정과 SameSite=None 가 필수   
-* 태블로에서 SameSite=None 설정 가능 유무는 확인 필요
+## 📝 Change Log
 
-------
+### 2025.01.06
+- ✨ 권한 관리 테이블 분리
+- 🔒 태블로 서버 접속 시 권한 확인 로직 추가
 
-V. 24.08.06   
-* Cached Rotation 서비스 추가 --> 초기 로딩 후 지연 X(한시간 마다 재로당)   
-* but 크롬 정책으로 전체화면 간 자동 전환을 지원하지 않아, F11 로 수동 전체화면 진입 필요.   
-* 접속 url : http://{서버IP}/cache    
-   
-V. 24.08.07   
-* 좌우 간 이동 버튼 추가   
-* 대시보드 전환 시간 추가   
+### 2024.08.13
+- 🎮 키보드 네비게이션 추가 (좌/우 화살표, 스페이스바)
 
-V. 24.08.08   
-* 로그인 기능 추가 (인증된 사용자만 접속 가능)   
-* 세션 별 토큰 발급 추가   
+### 2024.08.12
+- 🎨 UI/UX 개선 (좌우 버튼 및 갱신시간 디자인)
+- 📝 로깅 기능 추가
 
-V. 24.08.09   
-* 접근 IP 별 태블로 서버 URL 분기 (SameSite Issue 연관)   
+### 2024.08.09 (v2)
+- 🔄 동적 대시보드 분기 추가
+- 🗃️ DB 연결 구현
+- 🎨 디자인 개선
 
-V. 24.08.09.02   
-* 동적 대시보드 분기 추가   
-* DB 연결 추가    
-* 디자인 변경   
-   
-V. 24.08.12
-* 화면 디자인 요소 변경 (좌우 버튼 및 갱신시간)   
-* 로깅 기능 추가   
+### 2024.08.09 (v1)
+- 🌐 접근 IP 별 태블로 서버 URL 분기 처리 (SameSite 이슈 대응)
 
-V. 24.08.13   
-* 좌우, 스페이스 버튼으로 화면 이동
+### 2024.08.08
+- 🔐 로그인 기능 구현
+- 🎫 세션별 토큰 발급 시스템 추가
+
+### 2024.08.07
+- ⬅️ ➡️ 네비게이션 버튼 추가
+- ⏱️ 대시보드 전환 시간 설정 기능
+
+### 2024.08.06
+- 🚀 캐시 기반 로테이션 서비스 도입
+  - 초기 로딩 후 지연 없는 전환 (1시간 주기 재로딩)
+  - ⚠️ 크롬 정책상 자동 전체화면 전환 미지원 (F11 수동 전환 필요)
+- 📍 접속 URL: `http://{서버IP}/cache`
+
+### 2024.08.05
+- 🎉 최초 릴리즈
+- 🔧 Tableau Ticket 기반 구현
+  - FireFox 기반 브라우저 호환
+
+## ⚠️ SameSite 관련 주의사항
+
+- Tableau Ticket 사용으로 인한 SameSite 이슈로 FireFox 기반 브라우저에서만 정상 동작
+- 토큰 발급 요청 URL(태블로 서버)과 Node 서버 URL 일치 필요
+  - 공인망 서버 사용시 동일 네트워크 필수
+  - 로컬 개발환경의 경우 HTTPS 설정 및 SameSite=None 필수
+
+### 참고 자료
+- [SameSite 쿠키 옵션 이해하기](https://www.codeit.kr/tutorials/94/쿠키의-SameSite-옵션이란?)
+- [Tableau SameSite 이슈 가이드](https://help.salesforce.com/s/articleView?id=001472205&type=1)

@@ -1,6 +1,7 @@
 // // services/urlService.js
 import oracledb from 'oracledb';
 import dbconfig from '../config/dbConfig.js';
+import logger from '../config/logger.js';
 
 
 
@@ -66,35 +67,30 @@ async function getUrlsForPath(path,tableauServerUrl) {
   }
 }
 
-// export default getUrlsForPath ;
 
-// const dummyData = {
-//   paths: ['ALL', 'BR', 'DD'],
-//   ALL: [
-//     'http://10.0.50.185/trusted/:token/views/POS_NEW_2_17158490567760/POS?:embed=yes&:showVizHome=no&:toolbar=no',
-//     'http://10.0.50.185/trusted/:token/views/_BR_/BR?:embed=yes&:showVizHome=no&:toolbar=no',
-//     'http://10.0.50.185/trusted/:token/views/_DD_/DD?:embed=yes&:showVizHome=no&:toolbar=no',
-//     'http://10.0.50.185/trusted/:token/views/2/BR?:embed=yes&:showVizHome=no&:toolbar=no'
-//   ],
-//   BR: [
-//     'http://10.0.50.185/trusted/:token/views/POS_NEW_2_17158490567760/POS?:embed=yes&:showVizHome=no&:toolbar=no',
-//     'http://10.0.50.185/trusted/:token/views/_BR_/BR?:embed=yes&:showVizHome=no&:toolbar=no',
-//     'http://10.0.50.185/trusted/:token/views/2/BR?:embed=yes&:showVizHome=no&:toolbar=no'
-//   ],
-//   DD: [
-//     'http://10.0.50.185/trusted/:token/views/POS_NEW_2_17158490567760/POS?:embed=yes&:showVizHome=no&:toolbar=no',
-//     'http://10.0.50.185/trusted/:token/views/_DD_/DD?:embed=yes&:showVizHome=no&:toolbar=no',
-//     'http://10.0.50.185/trusted/:token/views/2/BR?:embed=yes&:showVizHome=no&:toolbar=no'
-//   ]
-// };
-// const getPaths = async () => {
-//   return dummyData.paths;
-// }
+async function getAllowedUsers() {
+    let connection;
+    try {
+        connection = await oracledb.getConnection(dbconfig);
+        const result = await connection.execute(
+            `SELECT EMAIL 
+             FROM MST_DASHBOARD_AUTHORIZED_USERS 
+             WHERE USE_YN = 'Y'`
+        );
+        return result.rows.map(row => row[0]);
+    } catch (err) {
+        logger.error('Error fetching allowed users:', err);
+        return [];
+    } finally {
+        if (connection) {
+            try {
+                await connection.close();
+            } catch (err) {
+                logger.error('Error closing connection:', err);
+            }
+        }
+    }
+}
 
-// const getUrlsForPath = async (path) => {
-//   console.log("b");
-//   return dummyData[path] || [];
-// }
-
-export { getPaths, getUrlsForPath };
+export { getPaths, getUrlsForPath, getAllowedUsers };
 
